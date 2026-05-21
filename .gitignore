@@ -1,0 +1,26 @@
+# Environments
+stt_env/
+.venv/
+__pycache__/
+
+# Outputs
+outputs/
+
+# Media Files
+*.mp4
+*.wav
+*.webm
+*.m4a
+
+# macOS system files
+.DS_Store
+
+# Claude Code settings
+.claude/
+
+# IDE
+.vscode/
+.idea/
+
+# Generated scripts
+generate_rapport_pdf.py

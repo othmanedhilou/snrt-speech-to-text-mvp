@@ -1,0 +1,986 @@
+\documentclass[12pt,a4paper]{report}
+
+% ============================================================
+% Packages
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit}
+
+% ============================================================
+% Mise en page
+% ============================================================
+\geometry{
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2.5cm,
+    right=2.5cm
+}
+
+% ============================================================
+% Couleurs
+% ============================================================
+\definecolor{snrtblue}{RGB}{0, 70, 140}
+\definecolor{snrtred}{RGB}{180, 30, 30}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{codeframe}{RGB}{200, 200, 200}
+\definecolor{keyword}{RGB}{0, 100, 170}
+\definecolor{comment}{RGB}{100, 140, 100}
+\definecolor{string}{RGB}{170, 55, 55}
+
+% ============================================================
+% Style des listings
+% ============================================================
+\lstset{
+    backgroundcolor=\color{codebg},
+    frame=single,
+    rulecolor=\color{codeframe},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{keyword}\bfseries,
+    commentstyle=\color{comment}\itshape,
+    stringstyle=\color{string},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt,
+    xleftmargin=15pt,
+    framexleftmargin=15pt,
+}
+
+\lstdefinestyle{bash}{
+    language=bash,
+    morekeywords={pip, python, streamlit, ffmpeg, ollama, run, install},
+}
+
+\lstdefinestyle{python}{
+    language=Python,
+    morekeywords={self, True, False, None, as, from, import},
+}
+
+\lstdefinestyle{json}{
+    basicstyle=\ttfamily\small,
+    string=[s]{"}{"},
+    stringstyle=\color{string},
+    comment=[l]{:},
+    commentstyle=\color{black},
+}
+
+% ============================================================
+% En-têtes et pieds de page
+% ============================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{snrtblue}{SNRT — Système Speech-to-Text}}
+\fancyhead[R]{\small\textcolor{snrtblue}{\leftmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================
+% Style des titres
+% ============================================================
+\titleformat{\chapter}[display]
+    {\normalfont\huge\bfseries\color{snrtblue}}
+    {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+    {\normalfont\Large\bfseries\color{snrtblue}}
+    {\thesection}{1em}{}
+\titleformat{\subsection}
+    {\normalfont\large\bfseries\color{snrtblue!80}}
+    {\thesubsection}{1em}{}
+
+% ============================================================
+% Hyperliens
+% ============================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=snrtblue,
+    urlcolor=snrtred,
+    citecolor=snrtblue,
+    pdftitle={Rapport Technique — Système STT SNRT},
+    pdfauthor={SNRT},
+}
+
+% ============================================================
+% Document
+% ============================================================
+\begin{document}
+
+% ============================================================
+% Page de garde
+% ============================================================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\bfseries\textcolor{snrtblue}{Rapport Technique Détaillé}\par}
+    \vspace{0.5cm}
+    {\LARGE\textcolor{snrtblue!70}{Système de Transcription Automatique}\par}
+    {\LARGE\textcolor{snrtblue!70}{de la Parole (Speech-to-Text)}\par}
+
+    \vspace{1.5cm}
+
+    \rule{\textwidth}{1.5pt}
+    \vspace{0.5cm}
+    {\Large\textbf{Société Nationale de Radiodiffusion et de Télévision}\par}
+    {\Large\textbf{SNRT}\par}
+    \vspace{0.5cm}
+    \rule{\textwidth}{1.5pt}
+
+    \vspace{2cm}
+
+    {\large
+    \begin{tabular}{ll}
+        \textbf{Projet :} & Speech-to-Text MVP \\
+        \textbf{Version :} & 1.0 \\
+        \textbf{Date :} & Avril 2026 \\
+        \textbf{Classification :} & Rapport technique interne \\
+    \end{tabular}
+    }
+
+    \vfill
+
+    {\large\textcolor{gray}{Transcription automatique $\bullet$ Recherche intelligente $\bullet$ IPTV en direct}}
+
+\end{titlepage}
+
+% ============================================================
+% Table des matières
+% ============================================================
+\tableofcontents
+\newpage
+
+% ============================================================
+% Liste des figures et tableaux
+% ============================================================
+\listoffigures
+\listoftables
+\newpage
+
+% ============================================================
+% CHAPITRE 1 — Introduction
+% ============================================================
+\chapter{Introduction et Contexte}
+
+\section{Contexte général}
+
+Dans le cadre de la modernisation des outils de production audiovisuelle de la \textbf{Société Nationale de Radiodiffusion et de Télévision (SNRT)}, ce projet vise à développer un système de transcription automatique de la parole (\textit{Speech-to-Text}) capable de traiter les contenus audiovisuels avec une précision maximale.
+
+Le système prend en charge les langues utilisées dans les programmes de la SNRT, notamment le \textbf{français}, l'\textbf{arabe} et l'\textbf{amazigh}, avec une détection automatique de la langue parlée.
+
+\section{Objectifs du projet}
+
+Les objectifs principaux du système sont :
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Transcription de fichiers} — Convertir des fichiers audio et vidéo préenregistrés en texte avec une précision maximale.
+    \item \textbf{Transcription en temps réel} — Capturer et transcrire les flux IPTV et streams en direct des chaînes SNRT.
+    \item \textbf{Recherche intelligente} — Permettre la recherche par mots-clés dans les transcriptions générées.
+    \item \textbf{Identification des locuteurs} — Distinguer automatiquement les différents intervenants (diarisation).
+    \item \textbf{Post-correction linguistique} — Corriger les erreurs résiduelles via un modèle de langage (LLM).
+\end{enumerate}
+
+\section{Périmètre fonctionnel}
+
+Le système offre trois modes d'utilisation :
+
+\begin{itemize}
+    \item Une \textbf{interface web} interactive (Streamlit) avec trois onglets dédiés.
+    \item Une \textbf{interface en ligne de commande} (CLI) pour la transcription de fichiers.
+    \item Une \textbf{interface CLI} pour la capture et transcription de flux en direct.
+\end{itemize}
+
+% ============================================================
+% CHAPITRE 2 — Architecture
+% ============================================================
+\chapter{Architecture Générale}
+
+\section{Vue d'ensemble des modules}
+
+Le projet est structuré autour de quatre modules principaux, chacun ayant un rôle précis dans le pipeline de traitement.
+
+\begin{table}[H]
+    \centering
+    \caption{Modules du système}
+    \label{tab:modules}
+    \begin{tabular}{@{} l l p{7cm} @{}}
+        \toprule
+        \textbf{Module} & \textbf{Fichier} & \textbf{Rôle} \\
+        \midrule
+        Moteur de transcription & \texttt{pipeline.py} & C\oe ur du système — traitement audio, transcription, diarisation, correction, recherche \\
+        Interface web & \texttt{app.py} & Interface utilisateur Streamlit avec 3 onglets \\
+        CLI fichier & \texttt{run\_stt.py} & Transcription en ligne de commande pour fichiers \\
+        CLI stream & \texttt{run\_stream.py} & Transcription en ligne de commande pour flux en direct \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Diagramme de flux du pipeline}
+
+La figure~\ref{fig:pipeline} illustre le flux complet de traitement, de l'entrée audio/vidéo jusqu'à la génération des artefacts de sortie.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.2cm,
+        block/.style={rectangle, draw=snrtblue, fill=snrtblue!10, text width=10cm, minimum height=1cm, align=center, rounded corners=3pt, font=\small},
+        optional/.style={rectangle, draw=snrtred, fill=snrtred!5, text width=10cm, minimum height=1cm, align=center, rounded corners=3pt, font=\small, dashed},
+        arrow/.style={-{Stealth[length=3mm]}, thick, snrtblue}
+    ]
+        \node[block] (input) {Entrée (fichier audio/vidéo ou flux IPTV)};
+        \node[block, below=of input] (convert) {Conversion \& Normalisation audio (ffmpeg, loudnorm)};
+        \node[block, below=of convert] (denoise) {Réduction de bruit (noisereduce, spectral gating)};
+        \node[block, below=of denoise] (whisper) {Transcription Whisper (faster-whisper, large-v3)\\Passe 1 : déterministe | Passe 2 : ré-essai segments faibles};
+        \node[optional, below=of whisper] (diarize) {Diarisation des locuteurs (pyannote.audio) \textit{[optionnel]}};
+        \node[optional, below=of diarize] (llm) {Post-correction LLM (Ollama / Mistral) \textit{[optionnel]}};
+        \node[block, below=of llm] (save) {Sauvegarde des artefacts (JSON + TXT)};
+        \node[block, below=of save] (search) {Recherche intelligente dans la transcription};
+
+        \draw[arrow] (input) -- (convert);
+        \draw[arrow] (convert) -- (denoise);
+        \draw[arrow] (denoise) -- (whisper);
+        \draw[arrow] (whisper) -- (diarize);
+        \draw[arrow] (diarize) -- (llm);
+        \draw[arrow] (llm) -- (save);
+        \draw[arrow] (save) -- (search);
+    \end{tikzpicture}
+    \caption{Pipeline complet de traitement audio et transcription}
+    \label{fig:pipeline}
+\end{figure}
+
+\section{Arborescence du projet}
+
+\begin{lstlisting}[style=bash, title=Structure des fichiers]
+snrt-speech-to-text-mvp/
+|-- app.py                 # Interface web Streamlit
+|-- pipeline.py            # Moteur de transcription
+|-- run_stt.py             # CLI transcription fichier
+|-- run_stream.py          # CLI transcription flux
+|-- nlp_keywords.py        # CLI recherche
+|-- requirements.txt       # Dependances Python
+|-- outputs/               # Repertoire de sortie
+|   |-- *.json             # Transcriptions JSON
+|   |-- *.txt              # Transcriptions texte
+|   |-- stream_chunks/     # Chunks audio temporaires
+\end{lstlisting}
+
+% ============================================================
+% CHAPITRE 3 — Technologies
+% ============================================================
+\chapter{Technologies et Dépendances}
+
+\section{Moteur de reconnaissance vocale}
+
+Le système utilise \textbf{faster-whisper}, une implémentation optimisée du modèle Whisper d'OpenAI basée sur le moteur \textbf{CTranslate2}. Cette implémentation offre :
+
+\begin{itemize}
+    \item Une vitesse de traitement \textbf{4 fois supérieure} à l'implémentation originale.
+    \item Une consommation mémoire \textbf{réduite de moitié} grâce à la quantification INT8.
+    \item Une compatibilité totale avec tous les modèles Whisper.
+\end{itemize}
+
+Le modèle utilisé par défaut est \textbf{large-v3} ($\sim$3 Go), le plus précis de la famille Whisper, entraîné sur plus de \textbf{680\,000 heures} de données audio multilingues couvrant 99 langues.
+
+\section{Pile technologique complète}
+
+\begin{table}[H]
+    \centering
+    \caption{Technologies utilisées}
+    \label{tab:techstack}
+    \begin{tabular}{@{} l l p{7cm} @{}}
+        \toprule
+        \textbf{Technologie} & \textbf{Version} & \textbf{Rôle} \\
+        \midrule
+        faster-whisper & 1.2.1 & Transcription ASR (reconnaissance automatique de la parole) \\
+        ffmpeg & 8.0.1 & Conversion, normalisation audio, capture de flux \\
+        noisereduce & 3.0.3 & Réduction de bruit par spectral gating \\
+        soundfile & 0.13.1 & Lecture et écriture de fichiers WAV \\
+        numpy & 2.4.3 & Calcul numérique pour le traitement audio \\
+        streamlit & 1.55.0 & Interface web interactive \\
+        yt-dlp & 2026.3.17 & Extraction d'URL de flux (YouTube, Twitch, etc.) \\
+        requests & 2.32.5 & Communication HTTP avec l'API Ollama \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Dépendances optionnelles}} \\
+        \midrule
+        pyannote.audio & — & Diarisation des locuteurs \\
+        Ollama + Mistral & — & Post-correction linguistique par LLM \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Modèles Whisper disponibles}
+
+\begin{table}[H]
+    \centering
+    \caption{Comparaison des modèles Whisper}
+    \label{tab:models}
+    \begin{tabular}{@{} l r r l @{}}
+        \toprule
+        \textbf{Modèle} & \textbf{Paramètres} & \textbf{Taille} & \textbf{Précision relative} \\
+        \midrule
+        tiny & 39 M & $\sim$75 Mo & Faible \\
+        base & 74 M & $\sim$140 Mo & Moyenne \\
+        small & 244 M & $\sim$460 Mo & Bonne \\
+        medium & 769 M & $\sim$1,5 Go & Très bonne \\
+        \textbf{large-v3} & \textbf{1\,550 M} & $\sim$\textbf{3 Go} & \textbf{Maximale} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% ============================================================
+% CHAPITRE 4 — Traitement Audio
+% ============================================================
+\chapter{Pipeline de Traitement Audio}
+
+\section{Conversion et normalisation}
+
+Tout fichier d'entrée (MP3, WAV, M4A, MP4, MKV, MOV, WEBM) est converti en format WAV mono 16\,kHz, le format standard requis par Whisper. La conversion est réalisée par \texttt{ffmpeg} avec normalisation du volume via le filtre \textbf{loudnorm}.
+
+\begin{lstlisting}[style=bash, title=Commande ffmpeg de conversion]
+ffmpeg -y -i input.mp4 -vn -acodec pcm_s16le -ar 16000 -ac 1 \
+    -af "loudnorm=I=-16:TP=-1.5:LRA=11" output.wav
+\end{lstlisting}
+
+\subsection{Paramètres de normalisation}
+
+\begin{table}[H]
+    \centering
+    \caption{Paramètres du filtre loudnorm (EBU R128)}
+    \label{tab:loudnorm}
+    \begin{tabular}{@{} l l p{7cm} @{}}
+        \toprule
+        \textbf{Paramètre} & \textbf{Valeur} & \textbf{Description} \\
+        \midrule
+        I (Integrated Loudness) & $-16$ LUFS & Niveau de volume intégré cible, conforme au standard EBU R128 \\
+        TP (True Peak) & $-1.5$ dB & Crête maximale autorisée pour éviter la saturation \\
+        LRA (Loudness Range) & $11$ dB & Plage de dynamique cible \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Cette normalisation garantit que les passages à voix basse ne sont pas perdus et que les variations de volume entre différentes sources sont équilibrées.
+
+\section{Réduction de bruit}
+
+Le module \texttt{noisereduce} applique un \textbf{spectral gating non-stationnaire} pour éliminer le bruit de fond ambiant, le bourdonnement électrique et les parasites.
+
+\begin{lstlisting}[style=python, title=Configuration de la réduction de bruit]
+reduced = nr.reduce_noise(
+    y=data,
+    sr=sample_rate,
+    prop_decrease=0.7,      # Reduction de 70% du bruit
+    n_fft=2048,             # Fenetre FFT de 2048 echantillons
+    stationary=False,       # Mode non-stationnaire
+)
+\end{lstlisting}
+
+\begin{table}[H]
+    \centering
+    \caption{Paramètres de réduction de bruit}
+    \label{tab:denoise}
+    \begin{tabular}{@{} l l p{7cm} @{}}
+        \toprule
+        \textbf{Paramètre} & \textbf{Valeur} & \textbf{Description} \\
+        \midrule
+        \texttt{prop\_decrease} & 0.7 & Réduction de 70\% du bruit détecté \\
+        \texttt{n\_fft} & 2048 & Fenêtre FFT pour une bonne résolution fréquentielle \\
+        \texttt{stationary} & False & Mode non-stationnaire, adapté aux environnements réels \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% ============================================================
+% CHAPITRE 5 — Moteur de Transcription
+% ============================================================
+\chapter{Moteur de Transcription}
+
+\section{Configuration du modèle}
+
+Le modèle Whisper est chargé avec les paramètres suivants :
+
+\begin{itemize}
+    \item \textbf{Modèle} : \texttt{large-v3} (1,5 milliard de paramètres)
+    \item \textbf{Device} : CPU avec quantification \texttt{int8}
+    \item \textbf{Cache} : le modèle est chargé une seule fois en mémoire et réutilisé
+\end{itemize}
+
+Le mécanisme de cache fonctionne à deux niveaux :
+\begin{enumerate}
+    \item \textbf{Niveau pipeline} : un dictionnaire \texttt{\_model\_cache} stocke les instances \texttt{WhisperModel} indexées par clé \texttt{modèle\_device\_compute}.
+    \item \textbf{Niveau Streamlit} : le décorateur \texttt{@st.cache\_resource} empêche le rechargement lors du rafraîchissement de l'interface.
+\end{enumerate}
+
+\section{Paramètres de transcription avancés}
+
+\begin{table}[H]
+    \centering
+    \caption{Paramètres de transcription Whisper}
+    \label{tab:whisper_params}
+    \begin{tabular}{@{} l l p{6.5cm} @{}}
+        \toprule
+        \textbf{Paramètre} & \textbf{Valeur} & \textbf{Effet} \\
+        \midrule
+        \texttt{beam\_size} & 10 & Recherche en faisceau élargie pour explorer plus d'hypothèses \\
+        \texttt{best\_of} & 5 & Sélection du meilleur résultat parmi 5 candidats \\
+        \texttt{vad\_filter} & True & Détection d'activité vocale (Silero VAD) \\
+        \texttt{min\_silence\_duration\_ms} & 500 & Silence minimum pour segmenter (500 ms) \\
+        \texttt{speech\_pad\_ms} & 300 & Marge autour des segments de parole (300 ms) \\
+        \texttt{word\_timestamps} & True & Horodatage au niveau de chaque mot \\
+        \texttt{hallucination\_silence\_threshold} & 1.0 & Suppression des hallucinations dans les silences \\
+        \texttt{repetition\_penalty} & 1.2 & Pénalité de répétition pour éviter les boucles \\
+        \texttt{no\_repeat\_ngram\_size} & 3 & Interdiction de répéter des trigrammes identiques \\
+        \texttt{log\_prob\_threshold} & $-1.0$ & Seuil de probabilité logarithmique \\
+        \texttt{no\_speech\_threshold} & 0.6 & Seuil de détection d'absence de parole \\
+        \texttt{condition\_on\_previous\_text} & True & Conditionnement sur le texte précédent \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Conditionnement par prompt initial}
+
+Le système utilise des \textit{prompts} initiaux spécifiques au domaine SNRT pour amorcer le modèle avec le vocabulaire attendu. Cette technique, appelée \textit{prompt conditioning}, réduit considérablement les erreurs de reconnaissance sur les noms propres et les termes spécialisés.
+
+\subsection{Prompt français}
+
+Le prompt français contient :
+\begin{itemize}
+    \item \textbf{Chaînes SNRT} : Al Aoula, Arryadia, Assadissa, Arrabia, Amazighie
+    \item \textbf{Villes marocaines} : Rabat, Casablanca, Marrakech, Fès, Tanger, Agadir, Meknès, Oujda, Tétouan, Dakhla, Nador, Kénitra, Mohammedia, Béni Mellal, Khénifra, Safi, El Jadida, Laâyoune
+    \item \textbf{Termes institutionnels} : Sa Majesté le Roi Mohammed VI, Parlement, gouvernement, ministre, premier ministre
+    \item \textbf{Vocabulaire économique} : dirham, PIB, croissance économique, inflation
+    \item \textbf{Sport} : Raja, Wydad, FAR, FRMF, Botola, CAN
+    \item \textbf{Termes courants} : COVID, OMS, ONU, UNESCO, Union Africaine, Ramadan, Aïd
+\end{itemize}
+
+\subsection{Prompt arabe}
+
+Le prompt arabe contient les équivalents en langue arabe des mêmes catégories de termes, incluant les noms des chaînes, les villes, les institutions et le vocabulaire de base.
+
+\section{Scores de confiance par mot}
+
+Chaque mot transcrit reçoit un \textbf{score de confiance} compris entre 0.0 et 1.0. Les mots dont la confiance est inférieure à \textbf{0.4} sont marqués avec le suffixe \texttt{[?]} dans le texte de sortie, permettant une révision ciblée.
+
+\begin{lstlisting}[title=Exemple de sortie avec marquage de confiance]
+Le [ministre?] a annonce la reforme du systeme educatif a Rabat.
+\end{lstlisting}
+
+\section{Transcription multi-passes}
+
+Le système implémente une stratégie de transcription en \textbf{deux passes} pour maximiser la précision.
+
+\subsection{Passe 1 — Déterministe}
+
+\begin{itemize}
+    \item Température fixée à \texttt{0.0} (décodage glouton)
+    \item Transcription complète du fichier audio
+    \item Calcul de la confiance moyenne par segment
+\end{itemize}
+
+\subsection{Passe 2 — Ré-essai des segments faibles}
+
+\begin{itemize}
+    \item Les segments dont la confiance moyenne est inférieure à \textbf{0.55} sont identifiés
+    \item Chaque segment faible est re-transcrit avec un échantillonnage par température progressive : $[0.2,\; 0.4,\; 0.6,\; 0.8,\; 1.0]$
+    \item Le résultat de la seconde passe remplace l'original \textbf{uniquement} si sa confiance est supérieure
+    \item L'alignement temporel est assuré par calcul de chevauchement (\textit{overlap}) entre segments
+\end{itemize}
+
+Cette approche multi-passes permet de récupérer des segments difficiles sans dégrader les segments déjà bien transcrits.
+
+% ============================================================
+% CHAPITRE 6 — Diarisation
+% ============================================================
+\chapter{Diarisation des Locuteurs}
+
+\section{Principe}
+
+La diarisation répond à la question \og~\textit{Qui parle à quel moment~?}~\fg. Le système utilise \textbf{pyannote.audio} avec le modèle \texttt{speaker-diarization-3.1}, qui :
+
+\begin{itemize}
+    \item Détecte automatiquement le nombre de locuteurs ou accepte un nombre fixé par l'utilisateur
+    \item Produit une segmentation temporelle par locuteur
+    \item Nécessite un token HuggingFace (\texttt{HF\_TOKEN}) pour accéder au modèle
+\end{itemize}
+
+\section{Algorithme d'attribution}
+
+L'algorithme d'attribution des locuteurs aux segments de transcription fonctionne en deux étapes :
+
+\begin{enumerate}
+    \item \textbf{Chevauchement maximal} : chaque segment de transcription est attribué au locuteur ayant le plus grand chevauchement temporel.
+    \item \textbf{Proximité} (fallback) : si aucun chevauchement n'est trouvé, le locuteur le plus proche temporellement est attribué.
+\end{enumerate}
+
+La formule de chevauchement est :
+\[
+    \text{overlap}(s, t) = \max\!\Big(0,\;\min(s_{\text{end}}, t_{\text{end}}) - \max(s_{\text{start}}, t_{\text{start}})\Big)
+\]
+
+où $s$ est le segment de transcription et $t$ est le tour de parole du locuteur.
+
+\section{Prérequis}
+
+\begin{lstlisting}[style=bash, title=Installation de pyannote.audio]
+pip install pyannote.audio
+export HF_TOKEN="votre_token_huggingface"
+\end{lstlisting}
+
+L'accès au modèle \texttt{pyannote/speaker-diarization-3.1} nécessite l'acceptation des conditions d'utilisation sur HuggingFace.
+
+% ============================================================
+% CHAPITRE 7 — Post-correction LLM
+% ============================================================
+\chapter{Post-correction par LLM}
+
+\section{Architecture}
+
+Le système peut se connecter à un serveur \textbf{Ollama} local (port 11434) exécutant le modèle \textbf{Mistral} pour corriger les erreurs résiduelles de transcription. L'endpoint est configurable via les variables d'environnement \texttt{LLM\_BASE\_URL} et \texttt{LLM\_MODEL}.
+
+\section{Double correction}
+
+Le processus de correction s'effectue en deux phases parallèles :
+
+\subsection{Correction globale}
+
+Le texte complet de la transcription est envoyé au LLM avec des instructions précises :
+
+\begin{itemize}
+    \item Corriger l'orthographe et la grammaire
+    \item Inférer les mots manquants ou mal entendus à partir du contexte
+    \item Corriger la ponctuation et la capitalisation
+    \item Rectifier les noms propres
+    \item Préserver le sens exact du texte original
+\end{itemize}
+
+\subsection{Correction par segments}
+
+Les segments sont traités par lots de 20 avec un format numéroté :
+
+\begin{lstlisting}[title=Format d'entrée/sortie de la correction par segments]
+1: Le menistre a annonce la reforme
+2: du system educatif a Rabat
+
+-> Correction:
+
+1: Le ministre a annonce la reforme
+2: du systeme educatif a Rabat
+\end{lstlisting}
+
+\subsection{Traçabilité}
+
+Le texte original avant correction est conservé dans le champ \texttt{text\_before\_correction} du fichier JSON de sortie, permettant la comparaison et l'audit.
+
+\section{Installation d'Ollama}
+
+\begin{lstlisting}[style=bash, title=Installation et configuration d'Ollama]
+# Telecharger et installer Ollama depuis https://ollama.ai
+# Puis telecharger le modele Mistral :
+ollama pull mistral
+\end{lstlisting}
+
+% ============================================================
+% CHAPITRE 8 — IPTV / Flux en direct
+% ============================================================
+\chapter{Transcription de Flux en Direct (IPTV)}
+
+\section{Protocoles supportés}
+
+Le système prend en charge une variété de protocoles de streaming :
+
+\begin{table}[H]
+    \centering
+    \caption{Protocoles de streaming supportés}
+    \label{tab:protocols}
+    \begin{tabular}{@{} l p{8cm} @{}}
+        \toprule
+        \textbf{Protocole} & \textbf{Description} \\
+        \midrule
+        HLS (m3u8) & Standard IPTV, utilisé par la majorité des diffuseurs \\
+        RTSP & Protocole de caméras et serveurs de streaming \\
+        RTP / UDP & Flux réseau bruts \\
+        HTTP & Flux audio/vidéo directs \\
+        YouTube / Twitch & Via yt-dlp pour l'extraction automatique d'URL \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Capture par chunks}
+
+Le système capture l'audio des flux en direct par morceaux (\textit{chunks}) de durée configurable (10 à 120 secondes, 30 secondes par défaut).
+
+\subsection{Paramètres de reconnexion}
+
+Pour les flux instables, \texttt{ffmpeg} est configuré avec des paramètres de reconnexion automatique :
+
+\begin{lstlisting}[style=bash, title=Paramètres ffmpeg pour la capture de flux]
+ffmpeg -y \
+    -reconnect 1 \
+    -reconnect_streamed 1 \
+    -reconnect_delay_max 5 \
+    -i "http://iptv.snrt.ma/stream.m3u8" \
+    -t 30 \
+    -vn -acodec pcm_s16le -ar 16000 -ac 1 \
+    -af "loudnorm=I=-16:TP=-1.5:LRA=11" \
+    chunk_0001.wav
+\end{lstlisting}
+
+\section{Flux de traitement par chunk}
+
+Pour chaque chunk, le système exécute les étapes suivantes :
+
+\begin{enumerate}
+    \item Capture de $N$ secondes d'audio depuis le flux
+    \item Normalisation et conversion en WAV 16\,kHz mono
+    \item Réduction de bruit (optionnelle)
+    \item Transcription (passe unique pour la vitesse)
+    \item Ajustement des horodatages avec l'offset temporel du chunk
+    \item Affichage en temps réel du texte transcrit
+\end{enumerate}
+
+\section{Sonde de connexion}
+
+Avant de démarrer la transcription, le système teste la connectivité au flux via \texttt{ffprobe} pour vérifier l'accessibilité, le format du conteneur et la durée (si disponible).
+
+\section{Fusion des résultats}
+
+À la fin de la session, tous les chunks sont fusionnés en un seul fichier de transcription (JSON + TXT) avec les segments ordonnés chronologiquement et les horodatages absolus.
+
+% ============================================================
+% CHAPITRE 9 — Interface Web
+% ============================================================
+\chapter{Interface Utilisateur Web (Streamlit)}
+
+\section{Configuration générale}
+
+L'interface est accessible via la commande \texttt{streamlit run app.py} et propose un layout large avec une barre latérale de configuration.
+
+\section{Barre latérale — Paramètres}
+
+La barre latérale regroupe l'ensemble des paramètres de configuration :
+
+\begin{table}[H]
+    \centering
+    \caption{Paramètres de la barre latérale}
+    \label{tab:sidebar}
+    \begin{tabular}{@{} l p{8cm} @{}}
+        \toprule
+        \textbf{Section} & \textbf{Options} \\
+        \midrule
+        Modèle Whisper & tiny, base, small, medium, large-v3 \\
+        Langue & fr, auto, en, ar, es \\
+        Audio \& Précision & Réduction de bruit (on/off), Multi-passes (on/off), Prompt initial personnalisable \\
+        Diarisation & Activation, mode auto ou nombre de locuteurs fixé (1-20) \\
+        Correction LLM & Activation (si Ollama disponible) \\
+        Recherche & Sensibilité (score min 0.4--1.5), nombre max de résultats (5--50) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Onglet 1 — Téléversement de fichier}
+
+Cet onglet permet :
+\begin{itemize}
+    \item L'upload de fichiers : MP3, WAV, M4A, MP4, MKV, MOV, WEBM
+    \item L'exécution de la pipeline complète : conversion $\rightarrow$ débruitage $\rightarrow$ transcription $\rightarrow$ diarisation $\rightarrow$ correction $\rightarrow$ sauvegarde
+    \item L'affichage d'indicateurs de progression pour chaque étape
+    \item L'affichage des chemins de sortie (JSON, TXT)
+\end{itemize}
+
+\section{Onglet 2 — Flux en direct / IPTV}
+
+Cet onglet propose :
+\begin{itemize}
+    \item La saisie de l'URL du flux
+    \item La configuration de la durée des chunks (10--120s) et du nombre de chunks (0 = illimité)
+    \item Un bouton \textbf{Test Connection} pour vérifier l'accessibilité du flux
+    \item Un bouton \textbf{Start Transcription} pour lancer la capture
+    \item Une barre de progression et un affichage en direct du texte transcrit
+    \item La sauvegarde automatique en fin de session
+\end{itemize}
+
+\section{Onglet 3 — Recherche}
+
+Cet onglet offre :
+\begin{itemize}
+    \item Un champ de recherche par mot-clé ou phrase
+    \item Une recherche par correspondance exacte et floue (\textit{fuzzy matching})
+    \item L'affichage des résultats avec horodatage, score de pertinence, identifiant du locuteur et score de confiance
+\end{itemize}
+
+% ============================================================
+% CHAPITRE 10 — CLI
+% ============================================================
+\chapter{Interface en Ligne de Commande (CLI)}
+
+\section{Transcription de fichier — \texttt{run\_stt.py}}
+
+\begin{lstlisting}[style=bash, title=Utilisation de run\_stt.py]
+python run_stt.py --input media.mp4 --language fr --model large-v3
+\end{lstlisting}
+
+\begin{table}[H]
+    \centering
+    \caption{Options de \texttt{run\_stt.py}}
+    \label{tab:cli_stt}
+    \begin{tabular}{@{} l p{8cm} @{}}
+        \toprule
+        \textbf{Flag} & \textbf{Description} \\
+        \midrule
+        \texttt{-{}-input} & Chemin du fichier média (obligatoire) \\
+        \texttt{-{}-output-dir} & Répertoire de sortie (défaut : \texttt{outputs/}) \\
+        \texttt{-{}-language} & Code langue (défaut : \texttt{fr}, \texttt{auto} pour détection) \\
+        \texttt{-{}-model} & Modèle Whisper (défaut : \texttt{large-v3}) \\
+        \texttt{-{}-no-denoise} & Désactiver la réduction de bruit \\
+        \texttt{-{}-no-multi-pass} & Désactiver le multi-passes \\
+        \texttt{-{}-no-correct} & Désactiver la correction LLM \\
+        \texttt{-{}-diarize} & Activer la diarisation \\
+        \texttt{-{}-num-speakers} & Nombre de locuteurs (auto si non spécifié) \\
+        \texttt{-{}-prompt} & Prompt initial personnalisé \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Le pipeline CLI suit 6 étapes numérotées avec affichage de la progression, du nombre de segments, des segments à faible confiance et d'un aperçu des 10 premiers segments.
+
+\section{Transcription de flux — \texttt{run\_stream.py}}
+
+\begin{lstlisting}[style=bash, title=Utilisation de run\_stream.py]
+python run_stream.py --url "http://example.com/stream.m3u8" --chunks 10
+python run_stream.py --url "rtsp://192.168.1.100/live" --chunk-duration 60
+\end{lstlisting}
+
+\begin{table}[H]
+    \centering
+    \caption{Options de \texttt{run\_stream.py}}
+    \label{tab:cli_stream}
+    \begin{tabular}{@{} l p{8cm} @{}}
+        \toprule
+        \textbf{Flag} & \textbf{Description} \\
+        \midrule
+        \texttt{-{}-url} & URL du flux (obligatoire) \\
+        \texttt{-{}-chunks} & Nombre de chunks (0 = illimité, Ctrl+C pour arrêter) \\
+        \texttt{-{}-chunk-duration} & Durée par chunk en secondes (défaut : 30) \\
+        \texttt{-{}-language} & Code langue (défaut : \texttt{fr}) \\
+        \texttt{-{}-model} & Modèle Whisper \\
+        \texttt{-{}-no-denoise} & Désactiver la réduction de bruit \\
+        \texttt{-{}-prompt} & Prompt initial personnalisé \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Le mode illimité (\texttt{chunks=0}) gère proprement le signal \texttt{SIGINT} (Ctrl+C) : le chunk en cours est terminé, puis les résultats sont sauvegardés avant la fermeture.
+
+% ============================================================
+% CHAPITRE 11 — Format de sortie
+% ============================================================
+\chapter{Format des Sorties}
+
+\section{Structure JSON}
+
+\begin{lstlisting}[title=Exemple de fichier JSON de sortie]
+{
+  "source": "interview_snrt.mp4",
+  "created_at": "20260427_143022",
+  "language": "fr",
+  "text": "Texte complet de la transcription...",
+  "text_before_correction": "Texte avant correction LLM...",
+  "llm_corrected": true,
+  "diarized": true,
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 4.52,
+      "text": "Bonjour et bienvenue au journal.",
+      "speaker": "SPEAKER_00",
+      "avg_confidence": 0.9234,
+      "words": [
+        {
+          "word": "Bonjour",
+          "start": 0.0,
+          "end": 0.45,
+          "confidence": 0.9812
+        }
+      ]
+    }
+  ]
+}
+\end{lstlisting}
+
+\section{Champs du JSON}
+
+\begin{table}[H]
+    \centering
+    \caption{Description des champs JSON}
+    \label{tab:json_fields}
+    \begin{tabular}{@{} l l p{6cm} @{}}
+        \toprule
+        \textbf{Champ} & \textbf{Type} & \textbf{Description} \\
+        \midrule
+        \texttt{source} & string & Chemin ou URL de la source \\
+        \texttt{created\_at} & string & Horodatage de création (YYYYMMDD\_HHMMSS) \\
+        \texttt{language} & string & Langue détectée \\
+        \texttt{text} & string & Texte complet (corrigé si LLM activé) \\
+        \texttt{text\_before\_correction} & string & Texte avant correction LLM \\
+        \texttt{llm\_corrected} & boolean & Indique si la correction LLM a été appliquée \\
+        \texttt{diarized} & boolean & Indique si la diarisation a été appliquée \\
+        \texttt{segments} & array & Liste des segments avec horodatage et confiance \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Fichier TXT}
+
+Le fichier TXT contient uniquement le texte complet de la transcription, sans métadonnées.
+
+\section{Convention de nommage}
+
+\begin{itemize}
+    \item \textbf{Fichiers} : \texttt{\{nom\_source\}\_\{YYYYMMDD\_HHMMSS\}.json} / \texttt{.txt}
+    \item \textbf{Streams} : \texttt{stream\_\{YYYYMMDD\_HHMMSS\}.json} / \texttt{.txt}
+    \item \textbf{Chunks audio} : \texttt{chunk\_0000.wav}, \texttt{chunk\_0001.wav}, etc.
+\end{itemize}
+
+% ============================================================
+% CHAPITRE 12 — Techniques d'optimisation
+% ============================================================
+\chapter{Techniques d'Optimisation de la Précision}
+
+Le système empile \textbf{10 techniques complémentaires} pour maximiser la qualité de transcription. Chacune cible une source d'erreur spécifique.
+
+\begin{table}[H]
+    \centering
+    \caption{Techniques d'optimisation de la précision}
+    \label{tab:optim}
+    \begin{tabular}{@{} c p{4cm} p{6.5cm} @{}}
+        \toprule
+        \textbf{N°} & \textbf{Technique} & \textbf{Effet} \\
+        \midrule
+        1 & Modèle large-v3 & Le plus précis de la famille Whisper (1,5 Md paramètres) \\
+        2 & Quantification INT8 & Réduction mémoire sans perte significative de qualité \\
+        3 & Normalisation loudnorm & Égalisation du volume (passages faibles préservés) \\
+        4 & Réduction de bruit & Suppression du bruit de fond par spectral gating \\
+        5 & VAD (Silero) & Filtrage des silences, prévention des hallucinations \\
+        6 & Beam search élargi & Exploration plus large de l'espace d'hypothèses \\
+        7 & Prompt initial & Vocabulaire SNRT pour les noms propres et termes techniques \\
+        8 & Anti-hallucination & Élimination des textes fantômes dans les silences \\
+        9 & Anti-répétition & Prévention des boucles de texte répétitif \\
+        10 & Multi-passes & Ré-essai des segments faibles avec température variable \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% ============================================================
+% CHAPITRE 13 — Installation
+% ============================================================
+\chapter{Guide d'Installation et d'Utilisation}
+
+\section{Prérequis système}
+
+\begin{itemize}
+    \item \textbf{Python} 3.10 ou supérieur
+    \item \textbf{ffmpeg} 8.0 ou supérieur (doit être dans le PATH système)
+    \item \textbf{Ollama} (optionnel, pour la post-correction LLM)
+\end{itemize}
+
+\section{Installation des dépendances}
+
+\begin{lstlisting}[style=bash, title=Installation des dépendances Python]
+pip install -r requirements.txt
+\end{lstlisting}
+
+Contenu du fichier \texttt{requirements.txt} :
+\begin{lstlisting}[title=requirements.txt]
+faster-whisper
+yt-dlp
+streamlit
+requests
+noisereduce
+soundfile
+numpy
+\end{lstlisting}
+
+\section{Dépendances optionnelles}
+
+\begin{lstlisting}[style=bash, title=Installation des composants optionnels]
+# Diarisation des locuteurs
+pip install pyannote.audio
+export HF_TOKEN="votre_token_huggingface"
+
+# Post-correction LLM
+# Installer Ollama depuis https://ollama.ai
+ollama pull mistral
+\end{lstlisting}
+
+\section{Lancement}
+
+\subsection{Interface web}
+\begin{lstlisting}[style=bash]
+streamlit run app.py --server.headless true
+\end{lstlisting}
+
+L'application est accessible à l'adresse \texttt{http://localhost:8501}.
+
+\subsection{CLI — Transcription de fichier}
+\begin{lstlisting}[style=bash]
+python run_stt.py --input mon_fichier.mp4 --language fr
+\end{lstlisting}
+
+\subsection{CLI — Transcription de flux en direct}
+\begin{lstlisting}[style=bash]
+python run_stream.py --url "http://iptv.snrt.ma/al_aoula.m3u8" \
+    --chunks 10 --chunk-duration 30
+\end{lstlisting}
+
+% ============================================================
+% CHAPITRE 14 — Conclusion
+% ============================================================
+\chapter{Conclusion}
+
+Ce système de transcription automatique de la parole offre une solution \textbf{complète et modulaire} pour les besoins de la SNRT. Il combine les techniques les plus avancées en reconnaissance vocale avec un pipeline de traitement audio robuste, une interface utilisateur intuitive et une architecture extensible.
+
+\medskip
+
+Les points forts du système sont :
+
+\begin{enumerate}
+    \item \textbf{Précision maximale} — L'empilement de 10 techniques d'optimisation complémentaires garantit une transcription de haute qualité.
+    \item \textbf{Multilinguisme} — La prise en charge native du français, de l'arabe et de la détection automatique de langue couvre l'ensemble des besoins de la SNRT.
+    \item \textbf{Temps réel} — La capture et transcription de flux IPTV en direct permet le sous-titrage et l'archivage en temps réel.
+    \item \textbf{Modularité} — Chaque composant (débruitage, diarisation, correction LLM) est activable indépendamment selon les besoins.
+    \item \textbf{Recherche intelligente} — La possibilité de rechercher dans les transcriptions facilite l'accès aux contenus archivés.
+    \item \textbf{Accessibilité} — Triple interface (web, CLI fichier, CLI stream) adaptée à différents profils d'utilisateurs.
+\end{enumerate}
+
+\medskip
+
+Le système est opérationnel et prêt à être déployé pour les chaînes de la SNRT : Al Aoula, Arryadia, Assadissa, Arrabia et Amazighie.
+
+\vfill
+
+\begin{center}
+    \rule{0.5\textwidth}{0.4pt}\\[0.5em]
+    {\large\textbf{Projet SNRT Speech-to-Text MVP}}\\
+    {\textcolor{gray}{Version 1.0 — Avril 2026}}
+\end{center}
+
+\end{document}

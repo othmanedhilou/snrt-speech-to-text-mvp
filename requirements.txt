@@ -1,0 +1,7 @@
+faster-whisper
+yt-dlp
+streamlit
+requests
+noisereduce
+soundfile
+numpy
