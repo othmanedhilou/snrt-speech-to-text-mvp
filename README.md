@@ -1,94 +1,105 @@
-# SNRT Speech-to-Text MVP (French-first, non-hardcoded)
+# SNRT Speech-to-Text — News Collector
 
-This project turns audio or video into searchable timestamped text.
+Système de transcription et collecte automatique de news depuis les streams IPTV des chaînes SNRT.
 
-Core flow:
-1. Ingest media file.
-2. Convert to clean WAV using ffmpeg (16kHz mono).
-3. Transcribe with Whisper.
-4. Save transcript artifacts (JSON + TXT).
-5. Search transcript segments by keyword/text with ranking.
+## Ce que fait le système
 
-## Project Files
-
-- run_stt.py: CLI transcription pipeline (no hardcoded media).
-- nlp_keywords.py: CLI transcript search (reads JSON output).
-- pipeline.py: Shared reusable logic for conversion, transcription, and retrieval.
-- app.py: Streamlit web app for testing.
-
-## Requirements
-
-System:
-- Python 3.10+
-- ffmpeg in PATH
-
-Python packages:
-- openai-whisper
-- yt-dlp
-- streamlit
-
-## Windows Setup
-
-Install system tools (PowerShell):
-
-```powershell
-winget install Python.Python.3.11
-winget install Gyan.FFmpeg
+```
+Streams IPTV (Al Aoula, Arryadia...) — 24h/7j
+        ↓  capture toutes les 30s
+    faster-whisper  →  transcription
+        ↓
+    spaCy NER       →  personnes / lieux / organisations
+    Groq (gratuit)  →  résumé en 2-3 phrases
+    Classification  →  politique / sport / économie...
+        ↓
+    SQLite          →  stockage indexé
+        ↓
+    Dashboard web   →  feed live + recherche + alertes
 ```
 
-Create environment and install project dependencies:
+## Fichiers
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+| Fichier | Rôle |
+|---|---|
+| `collector.py` | Daemon 24/7 — capture, transcription, NLP, stockage |
+| `dashboard.py` | Dashboard Streamlit — feed, recherche, entités, alertes |
+| `pipeline.py` | Moteur STT — faster-whisper, ffmpeg, noisereduce |
+| `nlp_pipeline.py` | NLP — classification sujet, NER spaCy, résumé Groq |
+| `db.py` | Base de données SQLite |
+| `config.py` | Configuration centralisée (lit `.env`) |
+| `app.py` | Outil standalone — transcription manuelle fichier/stream |
+| `run_stt.py` | CLI — transcription d'un fichier |
+| `run_stream.py` | CLI — transcription d'un stream en direct |
+| `nlp_keywords.py` | CLI — recherche dans un transcript JSON |
+
+> **`app.py`** = outil ponctuel (upload fichier ou test stream).
+> **`dashboard.py`** = interface du collector serveur (news en continu).
+
+## Stack — 100% gratuit
+
+| Composant | Outil | Coût |
+|---|---|---|
+| Transcription | faster-whisper (local) | Gratuit |
+| NER | spaCy fr_core_news_lg (local) | Gratuit |
+| Résumé IA | Groq API llama-3.3-70b | Gratuit (14 400 req/jour) |
+| Base de données | SQLite | Gratuit |
+| Serveur | Oracle Cloud Always Free (4 CPU, 24 GB RAM) | Gratuit à vie |
+| Interface | Streamlit | Gratuit |
+
+## Déploiement serveur (Oracle Cloud)
+
+```bash
+# 1. Cloner
+git clone https://github.com/othmanedhilou/snrt-speech-to-text-mvp.git
+cd snrt-speech-to-text-mvp
+
+# 2. Installer tout
+bash setup_server.sh
+
+# 3. Configurer les URLs des streams et la clé Groq
+cp .env.example .env
+nano .env
+
+# 4. Lancer
+sudo systemctl start snrt-collector
+sudo systemctl start snrt-dashboard
+
+# 5. Dashboard accessible sur http://VOTRE_IP:8501
 ```
 
-## CLI Usage
+## Configuration `.env`
 
-1) Transcribe media to JSON/TXT artifacts:
-
-```powershell
-python run_stt.py --input path\to\your_video.mp4 --language fr --model small
+```env
+GROQ_API_KEY=your_groq_api_key      # console.groq.com — gratuit
+WHISPER_MODEL=small                  # small sur CPU, medium si 24GB RAM
+AL_AOULA_URL=http://...stream.m3u8
+ARRYADIA_URL=http://...stream.m3u8
+CHUNK_DURATION=30                    # secondes par capture
 ```
 
-Outputs are written to outputs/ with timestamped filenames.
-
-2) Search a generated transcript JSON:
+## Utilisation locale (sans serveur)
 
 ```powershell
-python nlp_keywords.py --transcript outputs\your_file_YYYYMMDD_HHMMSS.json --query coupe
-```
+# Activer l'environnement
+.venv\Scripts\Activate.ps1
 
-Optional tuning:
+# Dashboard collector (si collector.py tourne)
+streamlit run dashboard.py
 
-```powershell
-python nlp_keywords.py --transcript outputs\file.json --query cup --min-score 0.65 --limit 30
-```
-
-## Web App (Local Test)
-
-Run Streamlit:
-
-```powershell
+# Outil standalone (transcription manuelle)
 streamlit run app.py
+
+# CLI — transcrire un fichier
+python run_stt.py --input video.mp4 --language fr
+
+# CLI — stream en direct
+python run_stream.py --url "http://stream.m3u8" --chunks 10
 ```
 
-In the UI:
-1. Upload audio/video.
-2. Click Transcribe.
-3. Search with keyword/text.
-4. Read ranked matches with timestamps.
+## Prérequis système
 
-## Free Live Demo Options
-
-Recommended free deployment:
-1. Hugging Face Spaces (Streamlit support, easy public URL).
-2. Streamlit Community Cloud (also free, resource limits apply).
-
-## Notes
-
-- Start with language=fr for best French-first behavior.
-- Later, switch to language=auto for multilingual processing.
-- This is retrieval over Whisper output, not custom model training yet.
+- Python 3.10+
+- ffmpeg dans le PATH
+- Clé API Groq (gratuite sur console.groq.com)
+- URLs des streams SNRT

@@ -24,3 +24,10 @@ outputs/
 
 # Generated scripts
 generate_rapport_pdf.py
+
+# Database & runtime data
+data/
+logs/
+
+# Environment secrets
+.env
