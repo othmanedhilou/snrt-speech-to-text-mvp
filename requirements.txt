@@ -1,7 +1,13 @@
 faster-whisper
 yt-dlp
 streamlit
+streamlit-autorefresh
 requests
 noisereduce
 soundfile
 numpy
+spacy
+groq
+apscheduler
+pandas
+python-dotenv
